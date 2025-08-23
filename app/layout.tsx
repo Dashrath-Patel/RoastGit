@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from 'sonner';
+import { BackgroundRippleEffect } from '@/components/ui/background-ripple-effect';
 
 export const metadata: Metadata = {
   title: 'GitHub Roaster 🔥 - Roast Your GitHub Activity',
@@ -22,7 +23,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`min-h-screen antialiased ${inter.className}`}>
-        {children}
+        <BackgroundRippleEffect 
+          className="fixed inset-0 z-0"
+          intensity={0.6}
+          speed={1.5}
+          interactive={true}
+        />
+        <div className="relative z-10 min-h-screen">
+          {children}
+        </div>
         <Toaster 
           position="top-center" 
           richColors

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { BackgroundLines } from '@/components/ui/background-lines';
 import { toast } from 'sonner';
 
 export function GitHubRoaster() {
@@ -83,10 +84,9 @@ export function GitHubRoaster() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 relative overflow-hidden">
+    <BackgroundLines className="min-h-screen bg-gradient-to-br from-slate-950/80 via-purple-950/80 to-slate-950/80 relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-slate-900 to-black"></div>
-      <div className="absolute inset-0 bg-grid-white/[0.02] bg-grid-16"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/10 via-slate-900/50 to-black/80"></div>
       
       <div className="relative z-10 min-h-screen flex flex-col">
         
@@ -97,17 +97,17 @@ export function GitHubRoaster() {
             {/* Title Section */}
             <div className="text-center space-y-8">
               <div className="space-y-4">
-                <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-red-400 via-orange-500 to-red-600 leading-tight">
+                <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-red-400 via-orange-500 to-red-600 leading-tight relative z-20">
                   🔥 GitHub Roaster 🔥
                 </h1>
-                <div className="h-1 w-32 bg-gradient-to-r from-red-500 to-orange-500 mx-auto rounded-full"></div>
+                <div className="h-1 w-32 bg-gradient-to-r from-red-500 to-orange-500 mx-auto rounded-full relative z-20"></div>
               </div>
               
               <div className="space-y-4">
-                <p className="text-2xl md:text-3xl text-gray-200 font-bold">
+                <p className="text-2xl md:text-3xl text-gray-200 font-bold relative z-20">
                   Ready to get <span className="text-red-400 underline decoration-wavy">absolutely roasted</span>?
                 </p>
-                <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed relative z-20">
                   Enter your GitHub username and prepare for the most brutal analysis of your coding life.
                   We&apos;ll examine your repos, commits, and habits with surgical precision! 🪄📟🦴💾🫠
                 </p>
@@ -307,6 +307,6 @@ export function GitHubRoaster() {
         </div>
 
       </div>
-    </div>
+    </BackgroundLines>
   );
 }

@@ -128,7 +128,7 @@ export default function RoastResultsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950/80 via-purple-950/80 to-slate-950/80 flex items-center justify-center">
         <Card className="w-96 bg-black/60 backdrop-blur-xl border-2 border-white/10">
           <CardContent className="p-12 text-center space-y-6">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-500 mx-auto"></div>
@@ -142,7 +142,7 @@ export default function RoastResultsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950/80 via-purple-950/80 to-slate-950/80 flex items-center justify-center">
         <Card className="w-96 bg-black/60 backdrop-blur-xl border-2 border-red-500/20">
           <CardContent className="p-12 text-center space-y-6">
             <div className="text-6xl">😕</div>
@@ -162,9 +162,8 @@ export default function RoastResultsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-slate-900 to-black"></div>
-      <div className="absolute inset-0 bg-grid-white/[0.02] bg-grid-16"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950/80 via-purple-950/80 to-slate-950/80">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/10 via-slate-900/50 to-black/80"></div>
       
       <div className="relative z-10 container mx-auto px-4 py-12 space-y-12">
         
@@ -185,7 +184,7 @@ export default function RoastResultsPage() {
               
               <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
                 <Avatar className="w-32 h-32 border-4 border-purple-500 shadow-2xl">
-                  <AvatarImage src={userData.avatar_url} alt={userData.name} />
+                  <AvatarImage src={userData.avatar_url} alt={userData.name || userData.login} />
                   <AvatarFallback className="text-4xl">
                     {userData.name?.charAt(0) || userData.login.charAt(0)}
                   </AvatarFallback>
