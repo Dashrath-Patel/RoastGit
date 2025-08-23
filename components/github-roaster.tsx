@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,11 +14,51 @@ export function GitHubRoaster() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const exampleUsers = ['torvalds', 'gaearon', 'sindresorhus', 'tj', 'addyosmani', 'kentcdodds'];
+    const exampleUsers = [
+    { username: 'torvalds', description: '🐧 Linux creator' },
+    { username: 'gaearon', description: '⚛️ React core team' },
+    { username: 'tj', description: '🚀 Express.js creator' },
+    { username: 'sindresorhus', description: '📦 NPM package legend' },
+    { username: 'addyosmani', description: '🔧 Google Chrome team' },
+    { username: 'paulirish', description: '🌐 Web performance guru' },
+    { username: 'mojombo', description: '🐙 GitHub co-founder' },
+    { username: 'defunkt', description: '💎 GitHub co-founder' },
+    { username: 'bradfitz', description: '🐹 Go team at Google' },
+    { username: 'fabpot', description: '🎼 Symfony creator' },
+    { username: 'mdo', description: '🎨 Bootstrap creator' },
+    { username: 'fat', description: '🎯 Bootstrap co-creator' }
+  ];
+
+  // Fun loading messages
+  const loadingMessages = [
+    "Analyzing your code crimes...",
+    "Calculating cringe levels...", 
+    "Preparing devastating burns...",
+    "Loading roast algorithms...",
+    "Scanning for questionable commits...",
+    "Measuring code quality... or lack thereof...",
+    "Gathering evidence of programming sins...",
+    "Charging up the roast cannon...",
+    "Detecting spaghetti code patterns...",
+    "Initializing savage mode..."
+  ];
+
+  const [currentLoadingMessage, setCurrentLoadingMessage] = useState(loadingMessages[0]);
+
+  // Rotate loading messages
+  useEffect(() => {
+    if (loading) {
+      const interval = setInterval(() => {
+        setCurrentLoadingMessage(loadingMessages[Math.floor(Math.random() * loadingMessages.length)]);
+      }, 1500);
+      return () => clearInterval(interval);
+    }
+  }, [loading]);
 
   const handleRandomExample = () => {
     const randomUser = exampleUsers[Math.floor(Math.random() * exampleUsers.length)];
-    setUsername(randomUser);
+    setUsername(randomUser.username);
+    toast.success(`Selected ${randomUser.username} for you! 🎲`);
   };
 
   const handleRoastRequest = async () => {
@@ -125,14 +165,14 @@ export function GitHubRoaster() {
                     <div className="flex flex-wrap justify-center gap-3">
                       {exampleUsers.map((user) => (
                         <Button
-                          key={user}
-                          onClick={() => setUsername(user)}
+                          key={user.username}
+                          onClick={() => setUsername(user.username)}
                           variant="ghost"
                           size="sm"
                           className="bg-purple-600/30 hover:bg-purple-500/40 text-purple-200 hover:text-white border border-purple-500/40 hover:border-purple-400 rounded-full"
                           disabled={loading}
                         >
-                          @{user}
+                          @{user.username}
                         </Button>
                       ))}
                     </div>
@@ -153,12 +193,14 @@ export function GitHubRoaster() {
                     <Button
                       disabled
                       size="lg"
-                      className="w-full bg-gray-700 text-white text-xl h-16"
+                      className="w-full bg-gradient-to-r from-gray-700 to-gray-800 text-white text-xl h-16 relative overflow-hidden"
                     >
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center justify-center space-x-3 relative z-10">
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                        <span>🚀 Launching Roast Analysis...</span>
+                        <span className="animate-pulse">{currentLoadingMessage}</span>
                       </div>
+                      {/* Animated background */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 via-orange-500/20 to-red-500/20 animate-pulse"></div>
                     </Button>
                   )}
                 </div>

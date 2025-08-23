@@ -79,10 +79,98 @@ export class GitHubRoastEngine {
     /^\d+$/,
   ];
 
+  // Fun personality types based on GitHub behavior
+  private readonly personalityTypes = [
+    {
+      name: "The Perfectionist",
+      trigger: (user: GitHubUser, repos: Repository[], commits: CommitData[]) =>
+        commits.filter(c => c.message.includes('fix')).length > commits.length * 0.6,
+      roast: "You're the type who refactors 'Hello World' 15 times before committing it! 🔍"
+    },
+    {
+      name: "The Collector",
+      trigger: (user: GitHubUser, repos: Repository[], commits: CommitData[]) =>
+        user.public_repos > 50 && repos.filter(r => r.stargazers_count === 0).length > repos.length * 0.8,
+      roast: "You collect repositories like Pokemon cards, but nobody wants to trade with you! 📦"
+    },
+    {
+      name: "The Ghost",
+      trigger: (user: GitHubUser, repos: Repository[], commits: CommitData[]) =>
+        commits.length < 5 && user.public_repos > 0,
+      roast: "You're so invisible on GitHub, even your own repos don't recognize you! 👻"
+    },
+    {
+      name: "The Emoji Enthusiast",
+      trigger: (user: GitHubUser, repos: Repository[], commits: CommitData[]) => {
+        let emojiCount = 0;
+        commits.forEach(commit => {
+          this.emojiPatterns.forEach(pattern => {
+            const matches = commit.message.match(pattern);
+            if (matches) emojiCount += matches.length;
+          });
+        });
+        return emojiCount > commits.length;
+      },
+      roast: "Your commit messages have more emojis than a teenage girl's Instagram story! 📱✨"
+    },
+    {
+      name: "The Optimist",
+      trigger: (user: GitHubUser, repos: Repository[], commits: CommitData[]) =>
+        repos.filter(r => r.name.toLowerCase().includes('awesome') || r.name.toLowerCase().includes('amazing') || r.name.toLowerCase().includes('super')).length > 2,
+      roast: "Everything is 'awesome' and 'amazing' in your repos. Reality called - it wants its expectations back! 🌈"
+    }
+  ];
+
+  // Programming language stereotypes for fun roasting
+  private readonly languageStereotypes = {
+    'JavaScript': "JavaScript developer? Let me guess, you've reinvented the wheel 47 times and called it 'modern architecture' 🎡",
+    'TypeScript': "TypeScript user? You're the person who puts warning labels on coffee cups saying 'this is hot' ☕",
+    'Python': "Python developer? You write 3 lines of code and call it 'elegant simplicity' while Java devs cry in 50-line constructors 🐍",
+    'Java': "Java developer? You're still explaining why your Hello World program needs 5 design patterns and an XML config 📋",
+    'C++': "C++ developer? You manually manage memory while the rest of us moved on to having actual lives 🧠",
+    'Rust': "Rust developer? You probably mention memory safety at dinner parties and wonder why nobody invites you back 🦀",
+    'Go': "Go developer? You chose a language designed by Google for people who find C too exciting 🐹",
+    'PHP': "PHP developer in 2025? That's like being a VHS repair specialist - technically impressive but questionably relevant 💿",
+    'C#': "C# developer? Microsoft's Java with extra corporate flavor and meetings about meetings 🏢",
+    'Ruby': "Ruby developer? You're coding like it's 2010 and wondering why your startup ideas feel so... vintage 💎"
+  };
+
   generateRoast(user: GitHubUser, repos: Repository[], commits: CommitData[]): RoastResult {
     const roastElements = [];
     let score = 0;
     const badges = [];
+
+    // Add personality-based roasting (NEW!)
+    const personalityRoast = this.detectPersonality(user, repos, commits);
+    if (personalityRoast) {
+      roastElements.push(personalityRoast.text);
+      score += personalityRoast.score;
+      badges.push(...personalityRoast.badges);
+    }
+
+    // Add programming language stereotype roasting (NEW!)
+    const languageRoast = this.roastByLanguage(repos);
+    if (languageRoast) {
+      roastElements.push(languageRoast.text);
+      score += languageRoast.score;
+      badges.push(...languageRoast.badges);
+    }
+
+    // Add time-based coding patterns (NEW!)
+    const timeRoast = this.analyzeTimePatterns(commits);
+    if (timeRoast) {
+      roastElements.push(timeRoast.text);
+      score += timeRoast.score;
+      badges.push(...timeRoast.badges);
+    }
+
+    // Add repository naming creativity analysis (NEW!)
+    const namingRoast = this.analyzeNamingCreativity(repos);
+    if (namingRoast) {
+      roastElements.push(namingRoast.text);
+      score += namingRoast.score;
+      badges.push(...namingRoast.badges);
+    }
 
     // Profile roasting
     const profileRoast = this.roastProfile(user);
@@ -384,5 +472,196 @@ export class GitHubRoastEngine {
     const randomBurn = finalBurns[Math.floor(Math.random() * finalBurns.length)];
 
     return `${roast}\n\n${randomBurn}\n\n🎯 ${severityMessage}`;
+  }
+
+  // NEW UNIQUE ROASTING METHODS! 🔥
+
+  private detectPersonality(user: GitHubUser, repos: Repository[], commits: CommitData[]): { text: string; score: number; badges: string[] } | null {
+    for (const personality of this.personalityTypes) {
+      if (personality.trigger(user, repos, commits)) {
+        return {
+          text: `🎭 **Personality Type: ${personality.name}** - ${personality.roast}`,
+          score: 8,
+          badges: [`🎭 ${personality.name}`]
+        };
+      }
+    }
+    return null;
+  }
+
+  private roastByLanguage(repos: Repository[]): { text: string; score: number; badges: string[] } | null {
+    const languages = repos
+      .map(repo => repo.language)
+      .filter(Boolean) as string[];
+    
+    if (languages.length === 0) return null;
+
+    const languageCount: { [key: string]: number } = {};
+    languages.forEach(lang => {
+      languageCount[lang] = (languageCount[lang] || 0) + 1;
+    });
+
+    const primaryLanguage = Object.keys(languageCount).reduce((a, b) => 
+      languageCount[a] > languageCount[b] ? a : b
+    );
+
+    const stereotype = this.languageStereotypes[primaryLanguage as keyof typeof this.languageStereotypes];
+    if (stereotype) {
+      return {
+        text: `💻 **Language Analysis**: ${stereotype}`,
+        score: 10,
+        badges: [`💻 ${primaryLanguage} Enthusiast`]
+      };
+    }
+
+    return {
+      text: `💻 **Language Analysis**: ${primaryLanguage}? Interesting choice... said nobody ever! 🤔`,
+      score: 5,
+      badges: [`💻 ${primaryLanguage} Pioneer`]
+    };
+  }
+
+  private analyzeTimePatterns(commits: CommitData[]): { text: string; score: number; badges: string[] } | null {
+    if (commits.length === 0) return null;
+
+    const timeData = commits.map(commit => {
+      const date = new Date(commit.date);
+      return {
+        hour: date.getHours(),
+        day: date.getDay(), // 0 = Sunday, 6 = Saturday
+        date: date
+      };
+    });
+
+    const roasts = [];
+    const badges = [];
+    let score = 0;
+
+    // Late night coding analysis
+    const lateNightCommits = timeData.filter(t => t.hour >= 23 || t.hour <= 5).length;
+    if (lateNightCommits > commits.length * 0.4) {
+      roasts.push(`🌙 ${Math.round((lateNightCommits / commits.length) * 100)}% of your commits happen after 11 PM. Your code has insomnia, and probably bugs too!`);
+      score += 12;
+      badges.push('🌙 Night Owl Coder');
+    }
+
+    // Weekend warrior analysis
+    const weekendCommits = timeData.filter(t => t.day === 0 || t.day === 6).length;
+    if (weekendCommits > commits.length * 0.6) {
+      roasts.push(`🏖️ You code more on weekends than weekdays. Either you're super dedicated or your work-life balance needs therapy!`);
+      score += 10;
+      badges.push('🏖️ Weekend Warrior');
+    }
+
+    // Commit timing consistency
+    const hours = timeData.map(t => t.hour);
+    const hourVariance = this.calculateVariance(hours);
+    if (hourVariance < 4) {
+      roasts.push(`⏰ You commit at almost the same time every day. Are you a robot, or just really, really boring?`);
+      score += 8;
+      badges.push('⏰ Human Cron Job');
+    }
+
+    // Holiday coding (approximation)
+    const holidaySeasons = timeData.filter(t => {
+      const month = t.date.getMonth();
+      const day = t.date.getDate();
+      // Christmas/New Year season or July 4th area
+      return (month === 11 && day > 20) || (month === 0 && day < 5) || (month === 6 && day === 4);
+    }).length;
+
+    if (holidaySeasons > 0) {
+      roasts.push(`🎄 ${holidaySeasons} commits during holiday seasons? Your family must love watching you debug instead of opening presents!`);
+      score += 15;
+      badges.push('🎄 Holiday Code Goblin');
+    }
+
+    if (roasts.length === 0) return null;
+
+    return {
+      text: roasts.join(' '),
+      score,
+      badges
+    };
+  }
+
+  private analyzeNamingCreativity(repos: Repository[]): { text: string; score: number; badges: string[] } | null {
+    if (repos.length === 0) return null;
+
+    const roasts = [];
+    const badges = [];
+    let score = 0;
+
+    // Repository name analysis
+    const repoNames = repos.map(r => r.name.toLowerCase());
+    
+    // Check for sequential naming (project1, project2, etc.)
+    const sequentialPattern = /\d+$/;
+    const sequentialRepos = repoNames.filter(name => sequentialPattern.test(name));
+    if (sequentialRepos.length > 3) {
+      roasts.push(`🔢 You name repos like "project1", "project2"... Creative bankruptcy called - it wants its job back!`);
+      score += 15;
+      badges.push('🔢 Sequential Namer');
+    }
+
+    // Check for "my-" prefix abuse
+    const myPrefixRepos = repoNames.filter(name => name.startsWith('my-'));
+    if (myPrefixRepos.length > 2) {
+      roasts.push(`📝 "my-something" repos everywhere! We get it, they're yours. The GitHub URL already tells us that!`);
+      score += 10;
+      badges.push('📝 Captain Obvious');
+    }
+
+    // Check for clone/copy naming
+    const cloneWords = ['clone', 'copy', 'replica', 'version', 'fork'];
+    const cloneRepos = repoNames.filter(name => 
+      cloneWords.some(word => name.includes(word))
+    );
+    if (cloneRepos.length > 1) {
+      roasts.push(`📱 Multiple "clone" or "copy" repos? Originality left the chat and never came back!`);
+      score += 12;
+      badges.push('📱 Clone Trooper');
+    }
+
+    // Check for overly long names
+    const longNames = repos.filter(r => r.name.length > 40);
+    if (longNames.length > 0) {
+      roasts.push(`📏 Repository names longer than this sentence? Save the essays for your README!`);
+      score += 8;
+      badges.push('📏 Title Novelist');
+    }
+
+    // Check for single letter or number repos
+    const singleCharRepos = repoNames.filter(name => name.length === 1);
+    if (singleCharRepos.length > 0) {
+      roasts.push(`🔤 Single letter repo names? Did you run out of alphabet or creativity first?`);
+      score += 10;
+      badges.push('🔤 Minimalist Extremist');
+    }
+
+    // Check for "untitled" or "new" repos
+    const lazyNames = repoNames.filter(name => 
+      ['untitled', 'new', 'repo', 'project', 'code', 'stuff'].includes(name)
+    );
+    if (lazyNames.length > 0) {
+      roasts.push(`💤 Repos named "untitled" or "new"? Your creativity is so lazy, it filed for unemployment!`);
+      score += 14;
+      badges.push('💤 Name Procrastinator');
+    }
+
+    if (roasts.length === 0) return null;
+
+    return {
+      text: roasts.join(' '),
+      score,
+      badges
+    };
+  }
+
+  private calculateVariance(numbers: number[]): number {
+    if (numbers.length === 0) return 0;
+    const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+    const squaredDiffs = numbers.map(num => Math.pow(num - mean, 2));
+    return squaredDiffs.reduce((sum, diff) => sum + diff, 0) / numbers.length;
   }
 }
